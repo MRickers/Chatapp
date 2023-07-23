@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Chat</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #output {
+            width: 400px;
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        #input {
+            width: 100%;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Chat</h1>
+    <div id="output"></div>
+    <input type="text" id="input" placeholder="Type your message...">
+
+    <script>
+        const outputDiv = document.getElementById("output");
+        const inputField = document.getElementById("input");
+        const socket = new WebSocket("ws://localhost:5000/ws");
+
+        socket.onmessage = function(event) {
+            const message = event.data;
+            outputDiv.innerHTML += "<p>" + message + "</p>";
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+        };
+
+        inputField.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                const message = inputField.value;
+                inputField.value = "";
+                socket.send(message);
+            }
+        });
+    </script>
+</body>
+</html>

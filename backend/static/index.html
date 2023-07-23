@@ -2,26 +2,108 @@
 <html>
 <head>
     <title>WebSocket Chat</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: row;
+            width: 800px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        .user-column {
+            flex: 1;
+            border-right: 1px solid #ccc;
+            padding-right: 10px;
+        }
+
+        .user-column h2 {
+            margin-top: 0;
+        }
+
+        .chat-column {
+            flex: 3;
+            padding-left: 10px;
+        }
+
+        .chat-box {
+            width: 100%;
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        .input-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .input-container input {
+            flex: 1;
+            padding: 10px;
+        }
+
+        .input-container button {
+            padding: 10px;
+            margin-left: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>WebSocket Chat</h1>
-    <div id="chat"></div>
-    <input type="text" id="messageInput" placeholder="Type your message...">
-    <button onclick="sendMessage()">Send</button>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="chat-container">
+                <div class="user-column">
+                    <h2>Users Online</h2>
+                    <div id="users"></div>
+                </div>
+                <div class="chat-column">
+                    <h2>Chat Messages</h2>
+                    <div class="chat-box" id="output"></div>
+                    <div class="input-container">
+                        <input type="text" id="input" placeholder="Type your message..." class="form-control">
+                        <button onclick="sendMessage()" class="btn btn-primary">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        const socket = new WebSocket("ws://localhost:5000/ws");
+        const outputDiv = document.getElementById("output");
+        const usersDiv = document.getElementById("users");
+        const inputField = document.getElementById("input");
+        const socket = new WebSocket("ws://localhost:8080/ws");
 
         socket.onmessage = function(event) {
-            const chatDiv = document.getElementById("chat");
-            chatDiv.innerHTML += "<p>" + event.data + "</p>";
+            const message = event.data;
+            outputDiv.innerHTML += "<p>" + message + "</p>";
+            outputDiv.scrollTop = outputDiv.scrollHeight;
         };
 
+        inputField.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                sendMessage()
+            }
+        });
+
         function sendMessage() {
-            const messageInput = document.getElementById("messageInput");
-            const message = messageInput.value;
+            const message = inputField.value;
+            inputField.value = "";
             socket.send(message);
-            messageInput.value = "";
         }
     </script>
 </body>
